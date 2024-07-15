@@ -9,36 +9,41 @@ from model import GPT, GPTConfig, TokenizedDataset
 from torch import nn
 from torch.cuda.amp import GradScaler, autocast
 
-BATCH_SIZE = 16
-ACCUMULATION_STEPS = 4  # Accumulate gradients over this many steps
+BATCH_SIZE = 32  # 16
+ACCUMULATION_STEPS = 4  # 4 Accumulate gradients over this many steps
+PRINT_EVERY = 200  # Print training loss every this many batches
 
 # Set num_workers to the number of logical processors
 num_workers = os.cpu_count()
 
-def save_model_and_optimizer(model, optimizer, epoch):
+def save_model_and_optimizer(model, optimizer, epoch, file_idx):
     os.makedirs('checkpoints', exist_ok=True)
+    checkpoint_path = f'checkpoints/gpt2_epoch_{epoch + 1}_file_{file_idx + 1}.pt'
     checkpoint = {
         'model_state_dict': model.state_dict(),
         'optimizer_state_dict': optimizer.state_dict(),
-        'epoch': epoch
+        'epoch': epoch,
+        'file_idx': file_idx
     }
-    torch.save(checkpoint, f'checkpoints/gpt2_epoch_{epoch + 1}.pt')
+    torch.save(checkpoint, checkpoint_path)
+    print(f"Checkpoint saved at {checkpoint_path}")
 
 def load_model_and_optimizer(model, optimizer):
+    start_epoch = 0
     if os.path.exists('checkpoints'):
         checkpoint_files = [f for f in os.listdir('checkpoints') if f.startswith('gpt2_epoch_')]
         if checkpoint_files:
-            latest_checkpoint = max(checkpoint_files, key=lambda x: int(x.split('_')[-1].split('.')[0]))
+            latest_checkpoint = max(checkpoint_files, key=lambda x: (int(x.split('_')[2]), int(x.split('_')[4].split('.')[0])))
             checkpoint = torch.load(f'checkpoints/{latest_checkpoint}')
-            if 'model_state_dict' in checkpoint and 'optimizer_state_dict' in checkpoint and 'epoch' in checkpoint:
+            if 'model_state_dict' in checkpoint and 'optimizer_state_dict' in checkpoint:
                 model.load_state_dict(checkpoint['model_state_dict'])
                 optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
-                start_epoch = checkpoint['epoch']
+                start_epoch = checkpoint['epoch'] + 1
                 print(f"Model and optimizer loaded from checkpoint '{latest_checkpoint}'")
                 return start_epoch
             else:
                 print("Checkpoint file is missing required keys")
-    return 0
+    return start_epoch
 
 def generate_text(inputText):
     model.eval()  # Set model to evaluation mode
@@ -52,51 +57,44 @@ def generate_text(inputText):
     print(f"Generated text: {generated_text}")
 
 def train(model, loader, optimizer):
-    global counter0
     start_epoch = load_model_and_optimizer(model, optimizer)
-    scaler = GradScaler()  # Initialize scaler
+    print(f"Starting training from epoch {start_epoch + 1}")
+    scaler = GradScaler()
+    model.train()
+    start_time = time.time()
+    last_print_time = time.time()  # Initialize last print time
 
-    model.train()  # Set model to training mode
-    start_time = time.time()  # Start time for the entire training
-
-    for epoch in range(start_epoch, start_epoch + 5):  # Adjust as needed for more epochs
-        batch_time = time.time()  # Start time for batch processing
-        optimizer.zero_grad()  # Reset gradients
-        for batch_idx, (input_ids, labels) in enumerate(loader, 1):
+    for epoch in range(start_epoch, start_epoch + 5):
+        for batch_idx, (input_ids, labels) in enumerate(loader, start=1):
             input_ids, labels = input_ids.to(device), labels.to(device)
+            optimizer.zero_grad()
 
-            # Starts the autocast context
             with autocast():
                 logits = model(input_ids)
                 loss = nn.CrossEntropyLoss()(logits.view(-1, config.vocab_size), labels.view(-1))
 
-            # Scales loss and calls backward to create scaled gradients
             scaler.scale(loss).backward()
 
-            if batch_idx % ACCUMULATION_STEPS == 0:
-                # Unscales the gradients and step optimizer
+            if (batch_idx + 1) % ACCUMULATION_STEPS == 0:
                 scaler.step(optimizer)
                 scaler.update()
-                optimizer.zero_grad()  # Reset gradients
+                optimizer.zero_grad()
 
-            # Calculate tokens per second
-            tokens_per_batch = input_ids.size(0) * input_ids.size(1)  # batch size * sequence length
-            elapsed_time = time.time() - batch_time
+            tokens_per_batch = input_ids.numel()  # Total number of tokens in the batch
+            current_time = time.time()
+            elapsed_time = current_time - last_print_time  # Time since last print
+            tokens_per_second = PRINT_EVERY * tokens_per_batch / elapsed_time if elapsed_time > 0 else 0
 
-            # Reset batch timer for accurate measurement of next batch processing time
-            batch_time = time.time()
+            if batch_idx % PRINT_EVERY == 0:
+                time_since_start = current_time - start_time
+                print(f"Epoch {epoch + 1}, Batch {batch_idx}, Loss: {loss.item():.4f}")
+                print(f"Tokens in batch: {tokens_per_batch}, Elapsed time: {elapsed_time:.4f} sec, Tokens/sec: {tokens_per_second:.2f}")
+                print(f"Time Elapsed since start: {time_since_start:.2f} sec")
+                last_print_time = current_time  # Update last print time
 
-            if batch_idx % 200 == 0:
-                tokens_per_second = tokens_per_batch / elapsed_time if elapsed_time > 0 else 0
-                time_since_start = time.time() - start_time  # Calculate time since training started
-                print(f"Epoch {epoch + 1}, Batch {batch_idx}, Loss: {loss.item():.4f}, Tokens/sec: {tokens_per_second:.2f}, Time Elapsed: {time_since_start:.2f} sec")
-
-            # Save model and print sample every 1000 iterations
             if batch_idx % 1000 == 0:
-                save_model_and_optimizer(model, optimizer, epoch)
+                save_model_and_optimizer(model, optimizer, epoch, batch_idx)
                 generate_text("I am a")
-
-        counter0 += 1
 
     print("Training complete.")
 
