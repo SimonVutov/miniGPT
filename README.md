@@ -24,9 +24,13 @@ A framework for training GPT models with mixed precision, gradient accumulation,
     ```bash
     git clone https://github.com/SimonVutov/miniGPT.git
     ```
+2.1 downloading the following:
+CUDA Toolkit 12.5.0 (May 2024)
+cuDNN v8.9.7 (December 5th, 2023), for CUDA 12.x
 
-2. Install the required packages:
+2.2 Install the required packages:
     ```bash
+    pip install torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu121
     pip install datasets transformers torch tqdm
     ```
 
@@ -55,3 +59,6 @@ Epoch 1, Batch 200, Loss: 4.9928, Tokens/sec: 18374.01, Time Elapsed: 55.16 sec
 
 Epoch 1, Batch 400, Loss: 4.4935, Tokens/sec: 18840.11, Time Elapsed: 74.05 sec
 
+Other
+Create torch virtual environment: python -m venv torch-env
+Activate it: torch-env\Scripts\activate
