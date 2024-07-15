@@ -1,10 +1,6 @@
 # miniGPT
 A framework for training GPT models with mixed precision, gradient accumulation, and other features.
 
-# Efficient-GPT-Training
-
-A comprehensive framework for training GPT models with mixed precision and gradient accumulation.
-
 ## Features
 
 - **Mixed Precision Training**: Leverage FP16 and BFloat16 for faster training and reduced memory usage.
