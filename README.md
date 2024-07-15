@@ -46,8 +46,12 @@ A framework for training GPT models with mixed precision, gradient accumulation,
 ### Example
 
 An example of training output and generated text:
+
 Device:  cuda
+
 Model and optimizer loaded from checkpoint 'gpt2_epoch_1.pt'
+
 Epoch 1, Batch 200, Loss: 4.9928, Tokens/sec: 18374.01, Time Elapsed: 55.16 sec
+
 Epoch 1, Batch 400, Loss: 4.4935, Tokens/sec: 18840.11, Time Elapsed: 74.05 sec
 
