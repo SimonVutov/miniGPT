@@ -23,7 +23,6 @@ A framework for training GPT models with mixed precision, gradient accumulation,
 1. Clone the repository:
     ```bash
     git clone https://github.com/SimonVutov/miniGPT.git
-    cd Efficient-GPT-Training
     ```
 
 2. Install the required packages:
