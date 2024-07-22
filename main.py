@@ -64,37 +64,42 @@ def train(model, loader, optimizer):
     start_time = time.time()
     last_print_time = time.time()  # Initialize last print time
 
-    for epoch in range(start_epoch, start_epoch + 5):
-        for batch_idx, (input_ids, labels) in enumerate(loader, start=1):
-            input_ids, labels = input_ids.to(device), labels.to(device)
-            optimizer.zero_grad()
-
-            with autocast():
-                logits = model(input_ids)
-                loss = nn.CrossEntropyLoss()(logits.view(-1, config.vocab_size), labels.view(-1))
-
-            scaler.scale(loss).backward()
-
-            if (batch_idx + 1) % ACCUMULATION_STEPS == 0:
-                scaler.step(optimizer)
-                scaler.update()
+    # Open the loss file in append mode
+    with open('loss.txt', 'a') as loss_file:
+        for epoch in range(start_epoch, start_epoch + 5):
+            for batch_idx, (input_ids, labels) in enumerate(loader, start=1):
+                input_ids, labels = input_ids.to(device), labels.to(device)
                 optimizer.zero_grad()
 
-            tokens_per_batch = input_ids.numel()  # Total number of tokens in the batch
-            current_time = time.time()
-            elapsed_time = current_time - last_print_time  # Time since last print
-            tokens_per_second = PRINT_EVERY * tokens_per_batch / elapsed_time if elapsed_time > 0 else 0
+                with autocast():
+                    logits = model(input_ids)
+                    loss = nn.CrossEntropyLoss()(logits.view(-1, config.vocab_size), labels.view(-1))
 
-            if batch_idx % PRINT_EVERY == 0:
-                time_since_start = current_time - start_time
-                print(f"Epoch {epoch + 1}, Batch {batch_idx}, Loss: {loss.item():.4f}")
-                print(f"Tokens in batch: {tokens_per_batch}, Elapsed time: {elapsed_time:.4f} sec, Tokens/sec: {tokens_per_second:.2f}")
-                print(f"Time Elapsed since start: {time_since_start:.2f} sec")
-                last_print_time = current_time  # Update last print time
+                scaler.scale(loss).backward()
 
-            if batch_idx % 1000 == 0:
-                save_model_and_optimizer(model, optimizer, epoch, batch_idx)
-                generate_text("I am a")
+                if (batch_idx + 1) % ACCUMULATION_STEPS == 0:
+                    scaler.step(optimizer)
+                    scaler.update()
+                    optimizer.zero_grad()
+
+                tokens_per_batch = input_ids.numel()  # Total number of tokens in the batch
+                current_time = time.time()
+                elapsed_time = current_time - last_print_time  # Time since last print
+                tokens_per_second = PRINT_EVERY * tokens_per_batch / elapsed_time if elapsed_time > 0 else 0
+
+                if batch_idx % PRINT_EVERY == 0:
+                    time_since_start = current_time - start_time
+                    print(f"Epoch {epoch + 1}, Batch {batch_idx}, Loss: {loss.item():.4f}")
+                    print(f"Tokens in batch: {tokens_per_batch}, Elapsed time: {elapsed_time:.4f} sec, Tokens/sec: {tokens_per_second:.2f}")
+                    print(f"Time Elapsed since start: {time_since_start:.2f} sec")
+                    last_print_time = current_time  # Update last print time
+                    
+                    # Save the loss to the file
+                    loss_file.write(f"Epoch {epoch + 1}, Batch {batch_idx}, Loss: {loss.item():.4f}\n")
+
+                if batch_idx % 1000 == 0:
+                    save_model_and_optimizer(model, optimizer, epoch, 0)
+                    generate_text("I am a")
 
     print("Training complete.")
 
