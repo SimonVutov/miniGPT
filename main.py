@@ -93,7 +93,7 @@ def train(model, loader, optimizer):
                     print(f"Tokens in batch: {tokens_per_batch}, Elapsed time: {elapsed_time:.4f} sec, Tokens/sec: {tokens_per_second:.2f}")
                     print(f"Time Elapsed since start: {time_since_start:.2f} sec")
                     last_print_time = current_time  # Update last print time
-                    
+
                     # Save the loss to the file
                     loss_file.write(f"Epoch {epoch + 1}, Batch {batch_idx}, Loss: {loss.item():.4f}\n")
 
