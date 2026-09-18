@@ -1,0 +1,90 @@
+{
+  "step": 1000,
+  "epoch": 2,
+  "batches_seen": 20,
+  "tokens_seen": 2048000,
+  "training_seconds": 22.51117411215091,
+  "tokenizer": "byte",
+  "dataset_signature": "4631aadc23a617e2ab949cf67aacb12664a91284f338918d64efd646464f1767",
+  "settings": {
+    "batch_size": 16,
+    "accumulation": 1,
+    "workers": 0,
+    "precision": "fp32",
+    "learning_rate": 0.0003,
+    "seed": 42
+  },
+  "history": [
+    {
+      "step": 50,
+      "train_loss": 3.3468880653381348,
+      "validation_loss": 3.3474806994712996,
+      "validation_perplexity": 28.431017067564643,
+      "tokens_per_second": 90476.7348523893
+    },
+    {
+      "step": 100,
+      "train_loss": 2.903167486190796,
+      "validation_loss": 2.8761211925204395,
+      "validation_perplexity": 17.745308879646267,
+      "tokens_per_second": 91418.11017914627
+    },
+    {
+      "step": 150,
+      "train_loss": 2.751518726348877,
+      "validation_loss": 2.7106845080510347,
+      "validation_perplexity": 15.039566696763153,
+      "tokens_per_second": 91568.80671179682
+    },
+    {
+      "step": 200,
+      "train_loss": 2.629869222640991,
+      "validation_loss": 2.6412322463726476,
+      "validation_perplexity": 14.030481970461981,
+      "tokens_per_second": 91828.2001664037
+    },
+    {
+      "step": 400,
+      "train_loss": 2.469170331954956,
+      "validation_loss": 2.5215007987827165,
+      "validation_perplexity": 12.447263490392837,
+      "tokens_per_second": 92483.790307267
+    },
+    {
+      "step": 600,
+      "train_loss": 2.362999200820923,
+      "validation_loss": 2.43850049961585,
+      "validation_perplexity": 11.455849805923018,
+      "tokens_per_second": 91901.88616774343
+    },
+    {
+      "step": 800,
+      "train_loss": 2.2157342433929443,
+      "validation_loss": 2.3186547490677247,
+      "validation_perplexity": 10.161994674058423,
+      "tokens_per_second": 91067.03866719619
+    },
+    {
+      "step": 1000,
+      "train_loss": 2.264000177383423,
+      "validation_loss": 2.1673219365449503,
+      "validation_perplexity": 8.734860179615316,
+      "tokens_per_second": 90977.04054870004
+    }
+  ],
+  "initial_validation_loss": 5.531861573491934,
+  "config": {
+    "block_size": 128,
+    "vocab_size": 256,
+    "n_layer": 2,
+    "n_head": 4,
+    "n_embd": 128,
+    "dropout": 0.1
+  },
+  "parameters": 478720,
+  "torch": "2.14.0",
+  "python": "3.14.6",
+  "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "device": "cpu",
+  "eval_batches": 0
+}

@@ -1,0 +1,16 @@
+The engineer opened the notebook and measured the result.
+A small model is useful when its behavior can be tested.
+The reader asked a question and the writer gave an answer.
+Morning light crossed the desk while the program trained.
+A careful experiment records its settings and its failures.
+The next word depends on the words that came before it.
+We kept the training text separate from the validation text.
+The model saved its progress and continued the following day.
+The engineer opened the notebook and measured the result.
+A small model is useful when its behavior can be tested.
+The reader asked a question and the writer gave an answer.
+Morning light crossed the desk while the program trained.
+A careful experiment records its settings and its failures.
+The next word depends on the words that came before it.
+We kept the training text separate from the validation text.
+The model saved its progress and continued the following day.
