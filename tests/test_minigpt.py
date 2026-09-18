@@ -149,7 +149,7 @@ def test_cli_generation_with_legacy_stdout(monkeypatch, tmp_path):
     import io
     import main as cli
     output = io.BytesIO()
-    stream = io.TextIOWrapper(output, encoding="cp1252")
+    stream = io.TextIOWrapper(output, encoding="cp1252", newline="\n")
     monkeypatch.setattr(sys, "stdout", stream)
     monkeypatch.setattr(sys, "argv", ["main.py", "generate", "--checkpoint", str(tmp_path/"unused.pt")])
     monkeypatch.setattr(cli, "generate_text", lambda *args, **kwargs: "sample: \ufffd\U0001f600")
