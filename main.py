@@ -9,6 +9,7 @@ from pathlib import Path
 import platform
 from pickle import UnpicklingError
 import time
+import sys
 import torch
 from torch import nn
 from torch.utils.data import DataLoader
@@ -228,6 +229,8 @@ def train(args):
 
 
 def main():
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(errors="backslashreplace")
     parser = argparse.ArgumentParser(description="Train or sample a small causal transformer")
     commands = parser.add_subparsers(dest="command", required=True)
     training = commands.add_parser("train")

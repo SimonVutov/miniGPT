@@ -143,3 +143,16 @@ def test_cuda_precision(precision):
     x=torch.randint(0,256,(2,8))
     loss,count=train_update(model,optimizer,[(x,x)],torch.device("cuda"),scaler,precision)
     assert loss>0 and count==16
+
+
+def test_cli_generation_with_legacy_stdout(monkeypatch, tmp_path):
+    import io
+    import main as cli
+    output = io.BytesIO()
+    stream = io.TextIOWrapper(output, encoding="cp1252")
+    monkeypatch.setattr(sys, "stdout", stream)
+    monkeypatch.setattr(sys, "argv", ["main.py", "generate", "--checkpoint", str(tmp_path/"unused.pt")])
+    monkeypatch.setattr(cli, "generate_text", lambda *args, **kwargs: "sample: \ufffd\U0001f600")
+    cli.main()
+    stream.flush()
+    assert output.getvalue() == b"sample: \\ufffd\\U0001f600\n"
