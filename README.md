@@ -11,7 +11,7 @@ Requires Python 3.10+; CPU is sufficient. Install the appropriate
 [PyTorch build](https://pytorch.org/get-started/locally/) for CUDA if needed.
 
 ```sh
-git clone --depth 1 https://github.com/SimonVutov/miniGPT.git
+git clone --depth 1 --branch codex/portfolio-polish https://github.com/SimonVutov/miniGPT.git
 cd miniGPT
 python -m venv .venv
 source .venv/bin/activate  # Windows PowerShell: .venv\Scripts\Activate.ps1
@@ -22,7 +22,8 @@ python main.py train --data runs/tiny-data --output runs/tiny-model --steps 200 
 python main.py generate --checkpoint runs/tiny-model/last.pt --prompt "The " --tokens 80 --top-k 20
 ```
 
-Until merged, the corrected implementation is on `codex/portfolio-polish`.
+The command above selects the corrected review branch; after merging it into
+`main`, the `--branch` option can be omitted.
 The local sample is synthetic and verifies the workflow, not language quality.
 Tests and this quick start require no dataset or tokenizer downloads.
 `miniGPT.ipynb` runs the same code; open it from this directory using a Jupyter
